@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" rx="22" fill="#3f37c9"/>
+  <rect x="18" y="24" width="40" height="30" rx="8" fill="#ffffff"/>
+  <path d="M28 54 L26 64 L38 54 Z" fill="#ffffff"/>
+  <rect x="42" y="44" width="40" height="30" rx="8" fill="#ffd166"/>
+  <path d="M72 74 L74 84 L62 74 Z" fill="#ffd166"/>
+  <text x="38" y="45" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#3f37c9" text-anchor="middle">Fr</text>
+  <text x="62" y="65" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#3f37c9" text-anchor="middle">Vo</text>
+</svg>
