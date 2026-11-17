@@ -48,6 +48,33 @@
     return settings[lang];
   }
 
+  // ---------- Profil : prénom et couleur ----------
+
+  // Les couleurs elles-mêmes sont définies dans style.css ([data-color="…"]).
+  const COLORS = [
+    ["indigo", "Indigo", "#3f37c9"],
+    ["violet", "Violet", "#7b2cbf"],
+    ["rose", "Rose", "#d6336c"],
+    ["orange", "Orange", "#c2410c"],
+    ["vert", "Vert", "#2b8a3e"],
+    ["turquoise", "Turquoise", "#0b7f7f"],
+    ["bleu", "Bleu", "#1971c2"],
+    ["nuit", "Nuit", "#343a5e"],
+  ];
+
+  function profile() {
+    settings.profile = Object.assign({ name: "", color: "indigo", welcomed: false }, settings.profile);
+    return settings.profile;
+  }
+
+  function applyTheme() {
+    const pr = profile();
+    const color = COLORS.find((c) => c[0] === pr.color) || COLORS[0];
+    document.documentElement.dataset.color = color[0];
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", color[2]);
+  }
+
   // ---------- Vocabulaire ----------
 
   function toList(x) {
@@ -126,7 +153,7 @@
   function setHeader(title, back) {
     $title.textContent = title;
     $back.hidden = !back;
-    $statsBtn.hidden = state.view === "stats" || state.view === "session";
+    $statsBtn.hidden = state.view === "stats" || state.view === "session" || state.view === "settings";
   }
 
   function seg(key, options, current) {
@@ -161,6 +188,7 @@
     else if (state.view === "session") renderSession();
     else if (state.view === "summary") renderSummary();
     else if (state.view === "stats") renderStats();
+    else if (state.view === "settings") renderSettings();
   }
 
   // ---------- Accueil ----------
@@ -168,11 +196,16 @@
   function renderHome() {
     setHeader("📚 Voc", false);
     const now = Date.now();
+    const pr = profile();
+    let totalDue = 0;
+    let totalFresh = 0;
     const cards = Object.keys(LANGS)
       .map((lang) => {
         const L = LANGS[lang];
         const items = itemsFor(lang, THEMES[lang], langSettings(lang).dir);
         const c = E.counts(items, getP, now);
+        totalDue += c.due;
+        totalFresh += c.fresh;
         const nWords = THEMES[lang].reduce((n, t) => n + t.words.length, 0);
         const badges = [
           c.due ? `<span class="badge badge-due">${c.due} à revoir</span>` : "",
@@ -190,8 +223,61 @@
         </button>`;
       })
       .join("");
-    $view.innerHTML = `<div class="stack">${cards}</div>
+    let top;
+    if (!pr.welcomed) {
+      top = `<form class="welcome panel" data-form="welcome">
+        <h2>Bienvenue sur Voc 👋</h2>
+        <p class="muted small">Comment tu t'appelles ?</p>
+        <input id="welcome-name" class="text-input" type="text" maxlength="30" autocomplete="given-name"
+          autocapitalize="words" placeholder="Ton prénom" value="${esc(pr.name)}" />
+        <div class="row">
+          <button type="button" class="btn ghost" data-action="skip-welcome">Plus tard</button>
+          <button type="submit" class="btn primary">C'est parti</button>
+        </div>
+      </form>`;
+    } else {
+      const hour = new Date().getHours();
+      const hello = hour >= 18 || hour < 4 ? "Bonsoir" : "Bonjour";
+      let sub;
+      if (totalDue) sub = `${totalDue} mot${totalDue > 1 ? "s" : ""} à revoir aujourd'hui`;
+      else if (totalFresh) sub = `${totalFresh} nouveau${totalFresh > 1 ? "x" : ""} mot${totalFresh > 1 ? "s" : ""} t'attend${totalFresh > 1 ? "ent" : ""}.`;
+      else sub = "Tout est à jour, bravo ! 🎉";
+      top = `<div class="greeting">
+        <div>
+          <h2 class="greeting-title">${hello}${pr.name ? " " + esc(pr.name) : ""} 👋</h2>
+          <p class="greeting-sub">${sub}</p>
+        </div>
+        <button class="icon-round" data-action="open-settings" aria-label="Personnaliser">🎨</button>
+      </div>`;
+    }
+
+    $view.innerHTML = `${top}<div class="stack">${cards}</div>
       <p class="hint">Les mots ratés, mal orthographiés ou trouvés trop lentement reviennent plus souvent, jusqu'à ce qu'ils soient vraiment acquis.</p>`;
+  }
+
+  // ---------- Personnaliser ----------
+
+  function renderSettings() {
+    setHeader("🎨 Personnaliser", true);
+    const pr = profile();
+    const swatches = COLORS.map(
+      ([id, label, hex]) =>
+        `<button type="button" class="swatch${pr.color === id ? " active" : ""}" data-action="color" data-color="${id}"
+          style="--swatch:${hex}" aria-label="${label}" aria-pressed="${pr.color === id}">
+          <span class="swatch-dot"></span><span class="swatch-label">${label}</span>
+        </button>`
+    ).join("");
+    $view.innerHTML = `
+      <section class="panel">
+        <h2>Prénom</h2>
+        <input id="settings-name" class="text-input" type="text" maxlength="30" autocomplete="given-name"
+          autocapitalize="words" placeholder="Ton prénom" value="${esc(pr.name)}" />
+        <p class="muted small">Affiché sur l'accueil : « Bonjour <span id="name-preview">${pr.name ? esc(pr.name) : "…"}</span> 👋 »</p>
+      </section>
+      <section class="panel">
+        <h2>Couleur</h2>
+        <div class="swatches">${swatches}</div>
+      </section>`;
   }
 
   // ---------- Langue ----------
@@ -728,6 +814,7 @@
       settings = data.settings || {};
       saveProgress();
       saveSettings();
+      applyTheme();
       alert("Sauvegarde importée ✓");
       render();
     } catch (e) {
@@ -742,6 +829,7 @@
     else if (state.view === "stats") go(state.statsFrom === "lang" && state.lang ? "lang" : "home");
     else if (state.view === "session") quitSession();
     else if (state.view === "summary") go("lang");
+    else if (state.view === "settings") go("home");
   });
 
   $statsBtn.addEventListener("click", () => {
@@ -761,6 +849,17 @@
     if (a === "open-lang") {
       state.lang = el.dataset.lang;
       go("lang");
+    } else if (a === "open-settings") {
+      go("settings");
+    } else if (a === "skip-welcome") {
+      profile().welcomed = true;
+      saveSettings();
+      render();
+    } else if (a === "color") {
+      profile().color = el.dataset.color;
+      saveSettings();
+      applyTheme();
+      render();
     } else if (a === "set") {
       const ls = langSettings(state.lang);
       const v = el.dataset.value;
@@ -827,12 +926,29 @@
     render();
   });
 
+  $view.addEventListener("input", (e) => {
+    if (e.target.id !== "settings-name") return;
+    profile().name = e.target.value.trim();
+    saveSettings();
+    const preview = document.getElementById("name-preview");
+    if (preview) preview.textContent = profile().name || "…";
+  });
+
   $view.addEventListener("submit", (e) => {
     e.preventDefault();
+    if (e.target.dataset.form === "welcome") {
+      const pr = profile();
+      pr.name = document.getElementById("welcome-name").value.trim();
+      pr.welcomed = true;
+      saveSettings();
+      render();
+      return;
+    }
     if (!session || state.view !== "session") return;
     if (session.phase === "feedback") continueSession();
     else submitWrite(document.getElementById("answer").value);
   });
 
+  applyTheme();
   render();
 })();

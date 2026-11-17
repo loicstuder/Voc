@@ -729,3 +729,118 @@ main {
   color: var(--muted);
   font-size: 0.8rem;
 }
+
+/* ---------- Accueil personnalisé ---------- */
+
+.greeting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 4px 2px 16px;
+}
+
+.greeting-title {
+  margin: 0;
+  font-size: 1.55rem;
+  overflow-wrap: anywhere;
+}
+
+.greeting-sub {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.icon-round {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--card);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.welcome {
+  margin: 0 0 16px;
+  border-top: 5px solid var(--brand);
+}
+
+.welcome p {
+  margin: 0 0 8px;
+}
+
+.text-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1.1rem; /* ≥ 16px : évite le zoom automatique sur iPhone */
+  outline: none;
+}
+
+.text-input:focus {
+  border-color: var(--brand);
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 2px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.swatch.active {
+  border-color: var(--swatch);
+}
+
+.swatch-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--swatch);
+}
+
+.swatch.active .swatch-dot {
+  box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--swatch);
+}
+
+.swatch-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* ---------- Couleurs du thème ---------- */
+/* L'indigo est la couleur par défaut (:root). */
+
+:root[data-color="violet"] { --brand: #7b2cbf; --brand-dark: #5a189a; --brand-soft: #f1e6fb; }
+:root[data-color="rose"] { --brand: #d6336c; --brand-dark: #a61e4d; --brand-soft: #fde6ee; }
+:root[data-color="orange"] { --brand: #c2410c; --brand-dark: #9a3412; --brand-soft: #fff0e3; }
+:root[data-color="vert"] { --brand: #2b8a3e; --brand-dark: #1d6b2e; --brand-soft: #e3f5e7; }
+:root[data-color="turquoise"] { --brand: #0b7f7f; --brand-dark: #066060; --brand-soft: #dff5f4; }
+:root[data-color="bleu"] { --brand: #1971c2; --brand-dark: #0f4f8a; --brand-soft: #e3f0fc; }
+:root[data-color="nuit"] { --brand: #343a5e; --brand-dark: #23273f; --brand-soft: #e6e8f2; }
+
+@media (prefers-color-scheme: dark) {
+  :root[data-color="violet"] { --brand: #c39bf0; --brand-dark: #3c1361; --brand-soft: #2f2340; }
+  :root[data-color="rose"] { --brand: #f783ac; --brand-dark: #6b1634; --brand-soft: #3d1f2b; }
+  :root[data-color="orange"] { --brand: #ffa94d; --brand-dark: #6b2b05; --brand-soft: #3d2a17; }
+  :root[data-color="vert"] { --brand: #69db7c; --brand-dark: #164f24; --brand-soft: #1a3320; }
+  :root[data-color="turquoise"] { --brand: #4fd1c5; --brand-dark: #0b4a4a; --brand-soft: #173634; }
+  :root[data-color="bleu"] { --brand: #74c0fc; --brand-dark: #0f3a63; --brand-soft: #182c3f; }
+  :root[data-color="nuit"] { --brand: #a5acd6; --brand-dark: #23273f; --brand-soft: #262a40; }
+}
