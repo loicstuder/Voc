@@ -2,6 +2,8 @@
 
 Petite application web (PWA) pour apprendre son vocabulaire d'**anglais** et d'**italien** sur son téléphone.
 
+**En ligne :** https://loicstuder.github.io/Voc/
+
 L'app est personnelle : elle retient où ça coince. Un mot raté, mal orthographié ou trouvé trop lentement revient plus souvent, jusqu'à ce qu'il soit vraiment acquis.
 
 ## Fonctionnalités
